@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func HelloHandler(w http.ResponseWriter, r *http.Request) {
+func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Hello World\n")
 	for k, v := range r.Header {
 		r := ""
@@ -14,14 +14,19 @@ func HelloHandler(w http.ResponseWriter, r *http.Request) {
 			if i < len(v)-1 {
 				r += ","
 			}
-
+			w.Header().Add(k, r)
 		}
 		fmt.Fprintf(w, "%q: %q\n", k, r)
-		w.Header().Set(k, r)
+		// w.Header().Set(k, r)
 	}
 }
 
+func HealthzHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+}
+
 func main() {
-	http.HandleFunc("/", HelloHandler)
+	http.HandleFunc("/", IndexHandler)
+	http.HandleFunc("/healthz", HealthzHandler)
 	http.ListenAndServe(":8000", nil)
 }
